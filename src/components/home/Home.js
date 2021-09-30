@@ -1,6 +1,9 @@
 import useCurrentWeather from '../../utils/useCurrentWeather';
-import Input from './Input';
 import WeatherInfo from './CurrentWeather';
+import Input from './Input';
+import useDebounce from '../../utils/useDebounce';
+import { useEffect, useState } from 'react';
+import useCityFinder from '../../utils/useCityFinder';
 
 const Home = () => {
   const style = {
@@ -9,12 +12,22 @@ const Home = () => {
     width: '100vw',
     height: '100vh'
   }
-  // TODO: Make city id dynamic via input tag
-  const { success, loading, failure } = useCurrentWeather("1702934");
+
+  const cityFinder = useCityFinder();
+  const [cityID, setCityID] = useState("");
+  const [query, setQuery, result] = useDebounce(cityFinder);
+  const { success, loading, failure } = useCurrentWeather(cityID);
+  
+  useEffect(() => {
+    if (query.slice(-1) === '\u2063') {
+      setCityID(query.slice(0, -1))
+    }
+  }, [query])
+
   return (
     <main style={style}>
       <div style={{ paddingTop: '13rem' }}>
-        <Input />
+        <Input result={result} setQuery={setQuery} />
         {loading && <h4 className="text-center">Loading...</h4>}
         {success && <WeatherInfo data={success.data} />}
         {failure && <h4 className="text-center">Error!</h4>}
@@ -24,4 +37,3 @@ const Home = () => {
 }
 
 export default Home
-

@@ -3,34 +3,37 @@ import { useState, useEffect, useMemo } from 'react';
 
 /**
  * Custom hook for accessing current weather data for any location
- * @param {String} cityId The id the city you want to access weather data
+ * @param {String} cityID The id the city you want to access weather data
  */
-const useCurrentWeather = (cityId) => {
-  // Memoizing initial state object so its initialization will stay the same during
-  // numerous rendering throughout its lifecycle thus won't cause infinite loop to useEffect 
-  const initialState = useMemo(() => ({ loading: true, success: null, failure: null }), []);
-  
+const useCurrentWeather = (cityID) => {
+  // To preven infinite loop to useEffect 
+  const initialState = useMemo(() => ({ loading: false, success: null, failure: null }), []);
   // The state of the request being sent to API
-  const [currentWeather, setCurrentWeather] = useState(initialState);
+  const [requestState, setRequestState] = useState(initialState);
 
   useEffect(() => {
     const source = axios.CancelToken.source();
     (async () => {
-      try {
-        const res = await axios("/weather", {
-          cancelToken: source.token,
-          params: { id: cityId, units: "metric", appid: process.env.REACT_APP_API_KEY }
-        });
-        setCurrentWeather({ ...initialState, loading: false, success: res });
-      } catch (err) {
-        setCurrentWeather({ ...initialState, loading: false, failure: err });
+      if (cityID) {
+        try {
+          setRequestState({ ...initialState, loading: true })
+          const res = await axios("/weather", {
+            cancelToken: source.token,
+            params: { id: cityID, units: "metric", appid: process.env.REACT_APP_API_KEY }
+          });
+          setRequestState({ ...initialState, loading: false, success: res });
+        } catch (err) {
+          setRequestState({ ...initialState, loading: false, failure: err });
+        }
+      } else {
+        setRequestState({ ...initialState, loading: false })
       }
     })();
 
     return () => { source.cancel(); }
-  }, [cityId, initialState])
+  }, [cityID, initialState])
 
-  return currentWeather
+  return requestState
 }
 
 export default useCurrentWeather

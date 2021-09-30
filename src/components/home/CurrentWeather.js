@@ -45,12 +45,12 @@ const WeatherInfo = ({ data }) => {
         </div>
         <div className="col-sm-7 order-sm-2 order-1 text-right">
           <h3 className="mb-0">{name}</h3>
-          <p className="mb-0">{new Date().toLocaleString('en-NZ', dateOptions)}</p>
-          <p className="mb-sm-3 mb-0">{capitalize(description)}</p>
+          <small>{new Date().toLocaleString('en-NZ', dateOptions)}</small> <br />
+          <small>{capitalize(description)}</small>
         </div>
       </div>
 
-      <div className="row mt-2">
+      <div className="row mt-3">
         <div className="col-sm-5">
           Humidity: {humidity}% <br />
           Wind: {speed} <small>meter/sec</small> <br />
