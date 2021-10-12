@@ -7,7 +7,7 @@ import { useEffect, useState, useRef } from 'react';
  */
 const useDebounce = (searchHandler, delay = 1000) => {
   const [query, setQuery] = useState("");
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState([]);
   const didMount = useRef(false);
 
   useEffect(() => {
@@ -18,10 +18,11 @@ const useDebounce = (searchHandler, delay = 1000) => {
       if (query !== "") {
         // Execute the function if user stops typing
         debounceFn = setTimeout(() => {
-          setResult(searchHandler(query.trim()))
+          const arrayOfCities = searchHandler(query.trim());
+          setResult(arrayOfCities)
         }, delay);
       } else {
-        setResult(null);
+        setResult([]);
       }
     } else {
       didMount.current = true;
