@@ -1,4 +1,4 @@
-import { capitalize } from "../../utils/miniHelper";
+import { capitalize, dateFormat, responseDestructurer } from "../../utils/miniHelper";
 import { motion } from 'framer-motion';
 
 const parent = {
@@ -6,28 +6,8 @@ const parent = {
   visible: { opacity: 1, y: 0, transition: { duration: 1 } }
 }
 
-const WeatherInfo = ({ data }) => {
-  // Visit https://openweathermap.org/current#current_JSON for detailed documentation about the response
-  const {
-     weather: [{
-      description // Weather condition within the group
-    }],
-    main: {
-      temp, // Current temperature at the moment (Celsius)
-      temp_min, // Minimum temperature at the moment (Celsius)
-      temp_max, // Maximum temperature at the moment (Celsius)
-      humidity // Humidity percentage
-    },
-    wind: {
-      speed // Wind speed: meter/sec
-    },
-    clouds: {
-      all // Cloudiness percentage
-    },
-    name // City name
-  } = data;
-
-  const dateOptions = { hour12: true, weekday: "long", hour: "numeric", minute: "numeric" };
+const CurrentWeather = ({ data }) => {
+  const current = responseDestructurer(data);
 
   return (
     <motion.div
@@ -40,29 +20,29 @@ const WeatherInfo = ({ data }) => {
       <div className="row">
         <div className="col-sm-5 order-sm-1 order-2">
           <div className="d-flex justify-content-center align-items-start">
-            <h1>{temp}</h1> <span className="mt-2 ml-1">&#8451;</span>
+            <h1>{current.temp}</h1> <span className="mt-2 ml-1">&#8451;</span>
           </div>
         </div>
         <div className="col-sm-7 order-sm-2 order-1 text-right">
-          <h3 className="mb-0">{name}</h3>
-          <small>{new Date().toLocaleString('en-NZ', dateOptions)}</small> <br />
-          <small>{capitalize(description)}</small>
+          <h3 className="mb-0">{current.name}</h3>
+          <small>{new Date().toLocaleString('en-NZ', dateFormat)}</small> <br />
+          <small>{capitalize(current.description)}</small>
         </div>
       </div>
 
       <div className="row mt-3">
         <div className="col-sm-5">
-          Humidity: {humidity}% <br />
-          Wind: {speed} <small>meter/sec</small> <br />
-          Cloudiness: {all}%
+          Humidity: {current.humidity}% <br />
+          Wind: {current.speed} <small>meter/sec</small> <br />
+          Cloudiness: {current.all}%
         </div>
         <div className="col-sm-7">
-          Max temperature: {temp_max} &#8451; <br />
-          Min temperature: {temp_min} &#8451;
+          Max temperature: {current.temp_max} &#8451; <br />
+          Min temperature: {current.temp_min} &#8451;
         </div>
       </div>
     </motion.div>
   )
 }
 
-export default WeatherInfo
+export default CurrentWeather
